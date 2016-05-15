@@ -1,5 +1,5 @@
 #!/usr/bin/env rake
-$: << File.dirname(__FILE__)
+$LOAD_PATH << File.dirname(__FILE__)
 
 require 'bundler'
 require 'rake'
@@ -10,7 +10,7 @@ Bundler::GemHelper.install_tasks
 task :default => [:spec]
 task :test => [:spec]
 
-desc "run spec tests"
+desc 'run spec tests'
 RSpec::Core::RakeTask.new('spec') do |t|
   t.pattern = 'spec/**/*_spec.rb'
 end

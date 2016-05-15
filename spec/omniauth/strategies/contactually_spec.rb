@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe OmniAuth::Strategies::OAuth2 do
-  def app; lambda{|env| [200, {}, ["Hello."]]} end
+  def app
+    ->(_env) { [200, {}, ['Hello.']] }
+  end
 
   before do
     @request = double('Request')
@@ -19,18 +21,17 @@ describe OmniAuth::Strategies::OAuth2 do
     OmniAuth.config.test_mode = false
   end
 
-  context "client options" do
-    it "has correct api site" do
-      subject.options.client_options.site.should eq("https://api.contactually.com/")
+  context 'client options' do
+    it 'has correct api site' do
+      subject.options.client_options.site.should eq('https://api.contactually.com/')
     end
 
-    it "has correct access token path" do
-      subject.options.client_options.token_url.should eq("https://auth.contactually.com/oauth2/token")
+    it 'has correct access token path' do
+      subject.options.client_options.token_url.should eq('https://auth.contactually.com/oauth2/token')
     end
 
-    it "has correct authorize url" do
-      subject.options.client_options.authorize_url.should eq("https://auth.contactually.com/oauth2/authorize")
+    it 'has correct authorize url' do
+      subject.options.client_options.authorize_url.should eq('https://auth.contactually.com/oauth2/authorize')
     end
   end
-
 end
