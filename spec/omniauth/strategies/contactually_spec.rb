@@ -5,16 +5,16 @@ describe OmniAuth::Strategies::OAuth2 do
     ->(_env) { [200, {}, ['Hello.']] }
   end
 
-  before do
-    @request = double('Request')
-    @request.stub(:params) { {} }
-    OmniAuth.config.test_mode = true
+  let(:strategy) do
+    OmniAuth::Strategies::Contactually.new(nil, @options || {}).tap do |strategy|
+      allow(strategy).to receive(:request) { @request }
+    end
   end
 
-  subject do
-    OmniAuth::Strategies::Contactually.new(nil, @options || {}).tap do |strategy|
-      strategy.stub(:request) { @request }
-    end
+  before do
+    @request = double('Request')
+    allow(@request).to receive(:params) { {} }
+    OmniAuth.config.test_mode = true
   end
 
   after do
@@ -22,16 +22,18 @@ describe OmniAuth::Strategies::OAuth2 do
   end
 
   context 'client options' do
+    subject { strategy.options.client_options }
+
     it 'has correct api site' do
-      subject.options.client_options.site.should eq('https://api.contactually.com/')
+      expect(subject.site).to eq('https://api.contactually.com/')
     end
 
     it 'has correct access token path' do
-      subject.options.client_options.token_url.should eq('https://auth.contactually.com/oauth2/token')
+      expect(subject.token_url).to eq('https://auth.contactually.com/oauth2/token')
     end
 
     it 'has correct authorize url' do
-      subject.options.client_options.authorize_url.should eq('https://auth.contactually.com/oauth2/authorize')
+      expect(subject.authorize_url).to eq('https://auth.contactually.com/oauth2/authorize')
     end
   end
 end
