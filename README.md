@@ -1,4 +1,13 @@
 # OmniAuth Contactually
+
+[![Gem Version](http://img.shields.io/gem/v/omniauth-contactually.svg)][gem]
+[![Build Status](http://img.shields.io/travis/contactually/omniauth-contactually.svg)][travis]
+[![Code Climate](http://img.shields.io/codeclimate/github/contactually/omniauth-contactually.svg)][codeclimate]
+
+[gem]: https://rubygems.org/gems/omniauth-contactually
+[travis]: http://travis-ci.org/contactually/omniauth-contactually
+[codeclimate]: https://codeclimate.com/github/contactually/omniauth-contactually
+
 Gem to authenticate applications to Contactually via OAuth2.
 
 # Background
