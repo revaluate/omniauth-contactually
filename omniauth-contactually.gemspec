@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
   # Lock at 1.3.x due to https://github.com/intridea/omniauth-oauth2/issues/81
   gem.add_dependency 'omniauth-oauth2', '~> 1.3.1'
 
-  gem.add_development_dependency 'simplecov'
   gem.add_development_dependency 'rack-test'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'rubocop'
