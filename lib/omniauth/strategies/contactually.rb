@@ -1,76 +1,52 @@
-require 'oauth2'
 require 'omniauth-oauth2'
-require 'multi_json'
 
 module OmniAuth
   module Strategies
     class Contactually < OmniAuth::Strategies::OAuth2
-      option :name, :contactually
+      # Give your strategy a name.
+      option :name, 'contactually'
 
+      # This is where you pass the options you would pass when
+      # initializing your consumer from the OAuth gem.
       option :client_options, :site => 'https://api.contactually.com/',
                               :authorize_url => 'https://auth.contactually.com/oauth2/authorize',
                               :token_url => 'https://auth.contactually.com/oauth2/token'
 
+      # These are called after authentication has succeeded. If
+      # possible, you should try to set the UID without making
+      # additional calls (if the user id is returned with the token
+      # or as a URI parameter). This may not be possible with all
+      # providers.
       uid { raw_info['id'] }
 
+      # https://github.com/intridea/omniauth/wiki/Auth-Hash-Schema#schema-10-and-later
       info do
         {
+          :name => name_from_raw_info,
           :email => raw_info['email'],
-          :all_info => raw_info
+          :first_name => raw_info['first_name'],
+          :last_name => raw_info['last_name'],
+          :image => raw_info['avatar_url']
         }
       end
 
-      credentials do
-        hash = { 'token' => access_token.token }
+      extra do
+        {
+          'raw_info' => raw_info
+        }
       end
 
       def raw_info
-        @raw_info ||= access_token.get('/v2/me.json').parsed['data']
-      end
-
-      def callback_phase
-        error = request.params['error_reason'] || request.params['error']
-        if error
-          fail!(error, CallbackError.new(request.params['error'], request.params['error_description'] || request.params['error_reason'], request.params['error_uri']))
-        elsif !options.provider_ignores_state && (request.params['state'].to_s.empty? || request.params['state'] != session.delete('omniauth.state'))
-          fail!(:csrf_detected, CallbackError.new(:csrf_detected, 'CSRF detected'))
-        else
-          self.access_token = build_access_token
-          env['omniauth.auth'] = auth_hash
-          call_app!
-        end
-      end
-
-      def build_access_token
-        auth_code = request.params['code']
-        response = connection.post do |req|
-          req.url client.token_url
-          req.headers['Content-Type'] = 'application/json'
-          req.body = { :client_id => client.id, :client_secret => client.secret, :code => auth_code, :grant_type => 'authorization_code', :redirect_uri => callback_url }.to_json
-        end
-        parsed_json = ActiveSupport::JSON.decode(response.body)
-        if response.status == 200
-          return ::OAuth2::AccessToken.from_hash(client, parsed_json)
-        else
-          e = Error.new(parsed_json['error_description'])
-          raise(e)
-        end
-      end
-
-      def validate_redirect_uri
-        grant.redirect_uri == redirect_uri
+        @raw_info ||= access_token.get('/v2/me').parsed['data']
       end
 
       private
 
-      def connection
-        @connection ||= begin
-          conn = Faraday.new(options[:client_options][:site], options[:connection_opts])
-          conn.build do |b|
-            response :json
-            options[:connection_build].call(b)
-          end if options[:connection_build]
-          conn
+      def name_from_raw_info
+        if raw_info['first_name'] || raw_info['last_name']
+          "#{raw_info['first_name']} #{raw_info['last_name']}".strip
+        else
+          raw_info['email']
         end
       end
     end
