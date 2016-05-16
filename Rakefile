@@ -1,16 +1,18 @@
 #!/usr/bin/env rake
-$LOAD_PATH << File.dirname(__FILE__)
-
-require 'bundler'
-require 'rake'
+require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 
-Bundler::GemHelper.install_tasks
+RSpec::Core::RakeTask.new
 
-task :default => [:spec]
-task :test => [:spec]
+task :test => :spec
 
-desc 'run spec tests'
-RSpec::Core::RakeTask.new('spec') do |t|
-  t.pattern = 'spec/**/*_spec.rb'
+begin
+  require 'rubocop/rake_task'
+  RuboCop::RakeTask.new
+rescue LoadError
+  task :rubocop do
+    $stderr.puts 'RuboCop is disabled'
+  end
 end
+
+task :default => [:spec, :rubocop]
