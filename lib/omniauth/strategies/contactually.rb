@@ -2,6 +2,7 @@ require 'omniauth-oauth2'
 
 module OmniAuth
   module Strategies
+    # Authentication strategy for connecting with the Contactually API.
     class Contactually < OmniAuth::Strategies::OAuth2
       # Give your strategy a name.
       option :name, 'contactually'
